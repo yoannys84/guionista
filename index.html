@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guionista</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<meta name="theme-color" content="#0d9488">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{--c:#0d9488;font-family:'Segoe UI',Inter,system-ui,sans-serif;background:#f4f5f7;color:#1f2328;font-size:17px;line-height:1.5}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.top{background:#fff;border-bottom:1px solid #e5e7eb;padding:12px 28px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:5}
+.logo{font-weight:700;font-size:20px}
+#nav{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+#nav button{font-size:15px;color:#444;padding:9px 14px;border-radius:10px}
+#nav button:hover{background:#f1f2f4}
+#nav button.on{background:#1f2328;color:#fff}
+main{max-width:880px;margin:0 auto;padding:28px 20px 70px}
+h1{font-size:28px}
+.q{font-size:15px;color:#6b7280;margin-bottom:10px;font-weight:600}
+.muted{color:#6b7280;font-size:14px;font-weight:400}
+.channels{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.ch{background:#fff;border:3px solid #e5e7eb;border-radius:18px;padding:16px;display:flex;align-items:center;gap:14px;font-size:18px;font-weight:600;text-align:left;transition:border-color .15s}
+.ch:hover{border-color:#c7cbd1}
+.e{font-size:28px;width:52px;height:52px;flex-shrink:0;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.e.big{width:60px;height:60px;font-size:32px}
+.chn{flex:1;min-width:0}
+.ch small{display:block;font-size:13px;font-weight:400;color:#6b7280;line-height:1.35;margin-top:2px}
+.ch.on{border-color:var(--c)}
+.ch.on::after{content:"✓";background:var(--c);color:#fff;width:28px;height:28px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px}
+.steps{display:flex;align-items:center;margin-bottom:22px}
+.st{display:flex;align-items:center;gap:10px;font-weight:600;color:#9ca3af;font-size:16px}
+.st .n{width:40px;height:40px;border-radius:50%;border:3px solid #d1d5db;display:flex;align-items:center;justify-content:center;font-size:17px;background:#fff}
+.st.now{color:#1f2328}.st.now .n{border-color:var(--c);background:var(--c);color:#fff}
+.st.done{color:#16a34a}.st.done .n{border-color:#16a34a;background:#16a34a;color:#fff}
+.line{flex:1;height:3px;background:#e5e7eb;margin:0 14px;border-radius:3px}
+.line.done{background:#16a34a}
+.card{background:#fff;border-radius:22px;padding:28px;border:1px solid #e5e7eb;margin-bottom:18px}
+.card h2{font-size:24px;margin-bottom:4px}
+.card h3{font-size:19px}
+.help{color:#6b7280;margin-bottom:18px}
+.card-h{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.do{display:flex;gap:16px;margin-bottom:22px}
+.do .b{width:34px;height:34px;flex-shrink:0;border-radius:50%;background:#f1f2f4;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+.do.ok .b{background:#dcfce7;color:#16a34a}
+.do .t{flex:1;min-width:0}
+.do .t>b{display:block;margin-bottom:8px}
+textarea,input[type=text],input[type=search],.ch-edit input{width:100%;border:2px solid #d1d5db;border-radius:14px;padding:12px 14px;font:inherit;background:#fff;color:inherit}
+textarea{min-height:120px;resize:vertical}
+textarea.long{min-height:170px}
+textarea:focus,input:focus{outline:none;border-color:var(--c)}
+.btn{border-radius:14px;padding:13px 20px;font-weight:600;display:inline-flex;align-items:center;gap:8px;text-decoration:none;cursor:pointer}
+.btn.main{background:var(--c);color:#fff;font-size:17px}
+.btn.main:hover{filter:brightness(.93)}
+.btn.soft{background:#f1f2f4;color:#1f2328}
+.btn.soft:hover{background:#e5e7eb}
+.btn.sm{padding:8px 14px;font-size:14px;border-radius:10px}
+.btn.danger{color:#dc2626}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.row.center{justify-content:center}
+.row.between{justify-content:space-between}
+.ok-msg{color:#16a34a;font-weight:600;font-size:15px}
+.err{color:#dc2626;font-size:14px;margin-top:8px;display:none}
+.wc{font-size:13px;color:#6b7280;margin-top:6px;min-height:18px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:6px;padding-top:20px;border-top:1px solid #eef0f2}
+.final{white-space:pre-wrap;background:#f9fafb;border:1px solid #e5e7eb;border-radius:14px;padding:18px;max-height:280px;overflow:auto;margin:12px 0 18px;font-size:16px}
+.final.tall{max-height:520px}
+details.prev{margin:-6px 0 22px 50px}
+details.prev summary{cursor:pointer;color:#4b5563;font-size:15px}
+.center{text-align:center}
+.big-ok{font-size:54px}
+.banner{background:#fff;border:1px solid #e5e7eb;border-radius:14px;padding:12px 16px;margin-bottom:18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:15px}
+.banner.warn{background:#fffbeb;border-color:#fde68a}
+.banner .btn{margin-left:auto}
+.page-h{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:8px 14px;border-radius:99px;background:#fff;border:1px solid #e5e7eb;font-size:15px}
+.chip.on{background:#1f2328;color:#fff;border-color:#1f2328}
+.filters input{flex:1;min-width:220px;padding:9px 14px}
+.item{width:100%;display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:12px 16px;margin-bottom:10px;text-align:left}
+.item:hover{border-color:#c7cbd1}
+.it{flex:1;min-width:0}
+.it b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.it small{color:#6b7280;font-size:14px}
+.pill{font-size:13px;padding:4px 10px;border-radius:99px;background:#fef3c7;color:#92400e;white-space:nowrap;font-weight:600}
+.pill.done{background:#dcfce7;color:#166534}
+.pill.gray{background:#f1f2f4;color:#6b7280}
+.empty{text-align:center;color:#6b7280;padding:40px 20px;background:#fff;border-radius:16px;border:1px dashed #d1d5db}
+.link{color:#4b5563;font-size:15px;margin-bottom:14px;display:inline-block}
+.det-h{display:flex;gap:16px;align-items:center}
+.title-in{font-size:22px !important;font-weight:700;border-color:transparent !important;padding:4px 8px !important;margin-left:-8px}
+.title-in:hover{border-color:#e5e7eb !important}
+.title-in:focus{border-color:var(--c) !important}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;border-bottom:1px solid #eef0f2;padding-bottom:12px}
+.tab{padding:8px 14px;border-radius:10px;font-size:15px;font-weight:600;color:#4b5563}
+.tab:hover{background:#f1f2f4}
+.tab.on{background:var(--c);color:#fff}
+.tab:disabled{color:#c4c8ce;cursor:default;background:none}
+.ch-edit{display:flex;gap:12px;flex-wrap:wrap}
+.ch-edit label{font-size:14px;color:#6b7280;font-weight:600;display:flex;flex-direction:column;gap:6px}
+.ch-edit label:first-child input{width:80px;text-align:center;font-size:22px;padding:7px}
+.pc-h{display:flex;gap:14px;align-items:flex-start;margin-bottom:6px}
+.pc-h .n{width:38px;height:38px;flex-shrink:0;border-radius:50%;background:var(--c);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.pc-h>div{flex:1}
+.pc-h .help{margin-bottom:10px;font-size:15px}
+.ptext{min-height:220px;font-size:15px}
+code{background:#f1f2f4;padding:1px 6px;border-radius:6px;font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.stat{background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:16px}
+.stat b{display:block;font-size:24px}
+.stat span{color:#6b7280;font-size:14px}
+.toast-pop{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#1f2328;color:#fff;padding:12px 20px;border-radius:12px;font-weight:600;font-size:15px;opacity:0;pointer-events:none;transition:.2s;z-index:20}
+.toast-pop.show{opacity:1;transform:translateX(-50%)}
+.toast-pop.err{background:#dc2626}
+@media (max-width:760px){.channels,.stats{grid-template-columns:1fr}.top{padding:12px 16px}#nav{margin-left:0}.st{font-size:0;gap:0}.card{padding:20px}details.prev{margin-left:0}}
+</style>
+</head>
+<body>
+<header class="top">
+<span class="logo">✍️ Guionista</span>
+<nav id="nav">
+<button data-v="nuevo">✍️ Crear guion</button>
+<button data-v="guiones">📚 Mis guiones</button>
+<button data-v="prompts">⚙️ Mis prompts</button>
+<button data-v="respaldo">💾 Copia de seguridad</button>
+</nav>
+</header>
+<main id="app"><p class="muted">Cargando…</p></main>
+<div id="toast" class="toast-pop" role="status"></div>
+
+<script>
+const COLORS={va:{c:'#0d9488',bg:'#ccfbf1'},yl:{c:'#e11d48',bg:'#ffe4e6'},y3:{c:'#7c3aed',bg:'#ede9fe'}};
+const STEP_NAMES=['Crear','Verificar','Humanizar'];
+const STEP_TITLES=['Crear el guion','Verificar los datos','Humanizar el guion'];
+const STEP_HELP=['Escribe la idea del video','El guion del paso 1 ya va dentro del prompt','El guion verificado ya va dentro del prompt'];
+
+function defaults(){return{version:1,channels:[
+ {id:'va',name:'Viviendo A360',sub:'Vida en Uruguay, historia y documental',emoji:'🧉',prompts:['','','']},
+ {id:'yl',name:'Yoa y Lary',sub:'Vlog familiar, día a día y viajes',emoji:'👨‍👩‍👧',prompts:['','','']},
+ {id:'y3',name:'Yoa 360',sub:'Historias de superación del mundo',emoji:'🌍',prompts:['','','']}],
+ scripts:[],activeId:null,lastChannel:'va',lastBackup:null};}
+
+/* ---------- almacenamiento (IndexedDB, con respaldo en localStorage) ---------- */
+const DB_NAME='guionista',STORE='kv';
+let dbh=null,saveT=null,D=null;
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,1);r.onupgradeneeded=()=>r.result.createObjectStore(STORE);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function load(){
+ try{dbh=await openDB();return await new Promise((res,rej)=>{const q=dbh.transaction(STORE).objectStore(STORE).get('data');q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error);});}
+ catch(e){dbh=null;try{const s=localStorage.getItem('guionista');return s?JSON.parse(s):null;}catch(_){memOnly=true;return null;}}
+}
+let memOnly=false;
+function save(){clearTimeout(saveT);saveT=setTimeout(saveNow,250);}
+function saveNow(){
+ clearTimeout(saveT);saveT=null;
+ const data=JSON.parse(JSON.stringify(D));
+ if(dbh){const tx=dbh.transaction(STORE,'readwrite');tx.objectStore(STORE).put(data,'data');tx.onerror=()=>toast('No se pudo guardar. Descarga una copia de seguridad.',true);}
+ else{try{localStorage.setItem('guionista',JSON.stringify(data));}catch(e){toast('No se pudo guardar. Descarga una copia de seguridad.',true);}}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&saveT)saveNow();});
+window.addEventListener('beforeunload',()=>{if(saveT)saveNow();});
+function normalize(d){
+ const def=defaults();
+ if(!d||!Array.isArray(d.channels)||!Array.isArray(d.scripts))return def;
+ def.channels.forEach(c=>{if(!d.channels.find(x=>x.id===c.id))d.channels.push(c);});
+ d.channels.forEach(c=>{if(!Array.isArray(c.prompts))c.prompts=[];while(c.prompts.length<3)c.prompts.push('');c.name=c.name||'Canal';c.sub=c.sub||'';c.emoji=c.emoji||'🎬';});
+ d.scripts.forEach(s=>{if(!Array.isArray(s.texts))s.texts=[];while(s.texts.length<3)s.texts.push('');s.idea=s.idea||'';s.step=Math.min(3,Math.max(0,s.step|0));s.created=s.created||Date.now();s.updated=s.updated||s.created;});
+ if(!d.channels.find(c=>c.id===d.lastChannel))d.lastChannel=d.channels[0].id;
+ return d;
+}
+
+/* ---------- utilidades ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const words=t=>{t=(t||'').trim();return t?t.split(/\s+/).length:0;};
+const fmtWords=t=>{const w=words(t);return w?`${w.toLocaleString('es')} palabras · ≈ ${Math.max(1,Math.round(w/150))} min de narración`:'';};
+const ch=id=>D.channels.find(c=>c.id===id)||D.channels[0];
+const col=id=>COLORS[id]||{c:'#0d9488',bg:'#ccfbf1'};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const fmtDate=ts=>new Date(ts).toLocaleDateString('es',{day:'numeric',month:'short',year:'numeric'});
+const deriveTitle=idea=>{const t=(idea||'').trim().split('\n')[0];return t.length>70?t.slice(0,67)+'…':t;};
+const titleOf=s=>s.title||deriveTitle(s.idea)||'Guion sin título';
+const statusOf=s=>s.step>=3?'Listo ✓':`Paso ${s.step+1} de 3 · ${STEP_NAMES[s.step]}`;
+const setAccent=id=>document.body.style.setProperty('--c',id?col(id).c:'#0d9488');
+let toastT;
+function toast(msg,err){const el=$('#toast');el.textContent=msg;el.className='toast-pop show'+(err?' err':'');clearTimeout(toastT);toastT=setTimeout(()=>el.className='toast-pop',2400);}
+async function copyText(t){
+ try{await navigator.clipboard.writeText(t);return true;}
+ catch(e){const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy');}catch(_){}ta.remove();return ok;}
+}
+function show(id,html){const el=document.getElementById(id);if(!el)return;if(html!==undefined)el.innerHTML=html;el.style.display='block';}
+function hide(id){const el=document.getElementById(id);if(el)el.style.display='none';}
+function markDo(id,ok){const el=document.getElementById(id);if(!el)return;el.classList.toggle('ok',ok);el.querySelector('.b').textContent=ok?'✓':el.dataset.l;}
+
+/* ---------- estado ---------- */
+let view='nuevo',detailId=null,detailTab=null,promptCh=null,filterCh='all',query='',copiedStep=-1;
+const cur=()=>D.scripts.find(s=>s.id===D.activeId)||null;
+function ensureScript(){
+ let s=cur();
+ if(!s){s={id:uid(),channel:D.lastChannel,title:'',idea:'',texts:['','',''],step:0,created:Date.now(),updated:Date.now()};D.scripts.unshift(s);D.activeId=s.id;}
+ return s;
+}
+function purgeEmpty(){
+ D.scripts=D.scripts.filter(s=>s.idea.trim()||s.texts.some(t=>t.trim()));
+ if(!cur())D.activeId=null;
+}
+function buildPrompt(C,step,s){
+ const tpl=C.prompts[step]||'';
+ const prev=step>0?s.texts[step-1]:'';
+ let out=tpl.split('{{IDEA}}').join(s.idea);
+ out=out.split('{{GUION}}').join(prev);
+ const tag=step===0?'{{IDEA}}':'{{GUION}}';
+ if(!tpl.includes(tag))out=out.trimEnd()+'\n\n'+(step===0?'IDEA DEL GUION:\n'+s.idea:'GUION:\n'+prev);
+ return out;
+}
+
+/* ---------- navegación ---------- */
+function go(v){view=v;copiedStep=-1;render();window.scrollTo(0,0);}
+document.getElementById('nav').addEventListener('click',e=>{const b=e.target.closest('button');if(b)go(b.dataset.v);});
+function render(){
+ document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===view||(view==='detalle'&&b.dataset.v==='guiones')));
+ const app=$('#app');
+ if(view==='nuevo')app.innerHTML=vNuevo();
+ else if(view==='guiones'){app.innerHTML=vGuiones();renderList();}
+ else if(view==='detalle')app.innerHTML=vDetalle();
+ else if(view==='prompts')app.innerHTML=vPrompts();
+ else app.innerHTML=vRespaldo();
+}
+function backupBanner(){
+ if(!D.scripts.length)return'';
+ if(D.lastBackup&&Date.now()-D.lastBackup<14*864e5)return'';
+ return `<div class="banner">💾 ${D.lastBackup?'Hace más de 2 semanas que no descargas una copia de seguridad.':'Todavía no descargaste ninguna copia de seguridad de tus guiones.'}<button class="btn soft sm" onclick="go('respaldo')">Hacer copia</button></div>`;
+}
+function channelButtons(selected,handler){
+ return `<div class="channels">${D.channels.map(x=>{const k=col(x.id);return `<button class="ch ${x.id===selected?'on':''}" style="--c:${k.c}" onclick="${handler}('${x.id}')"><span class="e" style="background:${k.bg}">${esc(x.emoji)}</span><span class="chn">${esc(x.name)}<small>${esc(x.sub)}</small></span></button>`;}).join('')}</div>`;
+}
+function stepsBar(step){
+ return `<div class="steps">${STEP_NAMES.map((n,i)=>`${i?`<div class="line ${i<=step?'done':''}"></div>`:''}<div class="st ${i<step?'done':i===step?'now':''}"><span class="n">${i<step?'✓':i+1}</span>${n}</div>`).join('')}</div>`;
+}
+
+/* ---------- vista: crear guion ---------- */
+function vNuevo(){
+ const s=cur(),cid=s?s.channel:D.lastChannel,C=ch(cid),step=s?s.step:0;
+ setAccent(cid);
+ let h=backupBanner();
+ h+=`<div class="q">1. ¿Para qué canal es el guion?</div>`+channelButtons(cid,'pickCh');
+ const missing=C.prompts.filter(p=>!p.trim()).length;
+ if(missing)h+=`<div class="banner warn">⚠️ ${missing===1?'Falta 1 prompt maestro':'Faltan '+missing+' prompts maestros'} de ${esc(C.name)}.<button class="btn soft sm" onclick="openPrompts('${cid}')">Cargar prompts</button></div>`;
+ h+=`<div class="q">2. Sigue los pasos${s?` <span class="muted">· ${esc(titleOf(s))}</span>`:''}</div>`+stepsBar(step);
+ if(step>=3)return h+finalCard(s,C);
+ const idea=s?s.idea:'',resp=s?s.texts[step]:'';
+ const L=step===0?['A','B','C']:['','A','B'];
+ h+=`<div class="card"><div class="card-h"><div><h2>Paso ${step+1}: ${STEP_TITLES[step]}</h2><p class="help">${esc(C.name)} · ${STEP_HELP[step]}</p></div>${s?`<button class="btn soft sm" onclick="newScript()">✨ Empezar otro</button>`:''}</div>`;
+ if(step===0){
+  h+=`<div class="do ${idea.trim()?'ok':''}" id="do-idea" data-l="A"><span class="b">${idea.trim()?'✓':'A'}</span><div class="t"><b>Escribe tu idea</b><textarea id="idea" placeholder="Ejemplo: La historia del Palacio Salvo, el edificio más alto de Sudamérica en 1928" oninput="onIdea(this.value)">${esc(idea)}</textarea><div class="err" id="e-idea">Escribe la idea primero.</div></div></div>`;
+ }
+ const cpOk=copiedStep===step;
+ h+=`<div class="do ${cpOk?'ok':''}" id="do-cp" data-l="${L[1]}"><span class="b">${cpOk?'✓':L[1]}</span><div class="t"><b>Copia el prompt y pégalo en Claude</b>
+ <div class="row"><button class="btn main" onclick="copyPrompt()">📋 Copiar prompt ${step+1}</button><a class="btn soft" href="https://claude.ai/new" target="_blank" rel="noopener">↗ Abrir Claude</a><span class="ok-msg" id="cp-ok">${cpOk?'✓ Copiado. Ahora pégalo en Claude':''}</span></div><div class="err" id="e-cp"></div></div></div>`;
+ if(step>0){const prev=s.texts[step-1];h+=`<details class="prev"><summary>👁 Ver el guion que va dentro del prompt (${fmtWords(prev)})</summary><div class="final">${esc(prev)}</div></details>`;}
+ h+=`<div class="do ${resp.trim()?'ok':''}" id="do-resp" data-l="${L[2]}"><span class="b">${resp.trim()?'✓':L[2]}</span><div class="t"><b>Pega aquí lo que te respondió Claude</b><textarea id="resp" class="long" placeholder="Pega la respuesta completa…" oninput="onResp(this.value)">${esc(resp)}</textarea><div class="wc" id="wc">${fmtWords(resp)}</div><div class="err" id="e-resp">Pega la respuesta de Claude para continuar.</div></div></div>`;
+ h+=`<div class="foot"><button class="btn soft" onclick="back()" style="visibility:${step?'visible':'hidden'}">← Atrás</button><span class="muted">Se guarda solo</span><button class="btn main" onclick="next()">${step===2?'Terminar ✓':'Siguiente paso →'}</button></div></div>`;
+ return h;
+}
+function finalCard(s,C){
+ return `<div class="card center"><div class="big-ok">🎉</div><h2>¡Guion listo!</h2><p class="help">“${esc(titleOf(s))}” quedó guardado en Mis guiones de ${esc(C.name)}.</p><p class="muted">${fmtWords(s.texts[2])}</p><div class="final" style="text-align:left">${esc(s.texts[2])}</div>
+ <div class="row center"><button class="btn main" onclick="copyFinal()">📋 Copiar guion final</button><button class="btn soft" onclick="openDetail('${s.id}')">📄 Ver todas las versiones</button><button class="btn soft" onclick="newScript()">✨ Empezar otro guion</button></div>
+ <div style="margin-top:16px"><button class="link" onclick="back()">← Volver al paso 3</button></div></div>`;
+}
+function onIdea(v){const s=ensureScript();s.idea=v;s.updated=Date.now();save();markDo('do-idea',!!v.trim());hide('e-idea');}
+function onResp(v){const s=ensureScript();s.texts[s.step]=v;s.updated=Date.now();save();markDo('do-resp',!!v.trim());$('#wc').textContent=fmtWords(v);hide('e-resp');}
+async function copyPrompt(){
+ const s=cur(),cid=s?s.channel:D.lastChannel,C=ch(cid),step=s?s.step:0;
+ hide('e-cp');
+ if(step===0&&!(s&&s.idea.trim())){show('e-idea');$('#idea').focus();return;}
+ if(!C.prompts[step].trim()){show('e-cp',`Todavía no cargaste el prompt ${step+1} de ${esc(C.name)}. <button class="btn soft sm" onclick="openPrompts('${cid}')">Cargarlo ahora</button>`);return;}
+ if(await copyText(buildPrompt(C,step,s))){copiedStep=step;markDo('do-cp',true);$('#cp-ok').textContent='✓ Copiado. Ahora pégalo en Claude';toast('Prompt copiado');}
+ else show('e-cp','No se pudo copiar. Intenta de nuevo.');
+}
+function next(){
+ const s=cur();
+ if(!s||!s.texts[s.step].trim()){show('e-resp');$('#resp').focus();return;}
+ s.step++;s.updated=Date.now();if(s.step===3)s.finished=Date.now();
+ saveNow();copiedStep=-1;render();window.scrollTo({top:0,behavior:'smooth'});
+ if(s.step===3)toast('¡Guion terminado y guardado!');
+}
+function back(){const s=cur();if(!s||s.step===0)return;s.step--;s.updated=Date.now();save();copiedStep=-1;render();}
+function newScript(){purgeEmpty();D.activeId=null;save();copiedStep=-1;go('nuevo');}
+function pickCh(id){
+ const s=cur();
+ if(!s){D.lastChannel=id;save();copiedStep=-1;render();return;}
+ if(s.channel===id)return;
+ const started=s.step>0||s.texts.some(t=>t.trim());
+ if(!started){s.channel=id;D.lastChannel=id;save();copiedStep=-1;render();return;}
+ if(confirm(`Este guion es de ${ch(s.channel).name} y ya está en marcha.\n\n¿Empezar un guion nuevo para ${ch(id).name}? El actual queda guardado en "Mis guiones" y puedes continuarlo cuando quieras.`)){
+  D.activeId=null;D.lastChannel=id;save();copiedStep=-1;render();
+ }
+}
+async function copyFinal(){const s=cur();if(s&&await copyText(s.texts[2]))toast('Guion final copiado');}
+
+/* ---------- vista: mis guiones ---------- */
+function vGuiones(){
+ setAccent(null);
+ const chip=(id,label)=>`<button class="chip ${filterCh===id?'on':''}" onclick="filterCh='${id}';render()">${esc(label)}</button>`;
+ return backupBanner()+`<div class="page-h"><h1>Mis guiones</h1><button class="btn main" onclick="newScript()">✨ Nuevo guion</button></div>
+ <div class="filters"><div class="chips">${chip('all','Todos')}${D.channels.map(c=>chip(c.id,c.emoji+' '+c.name)).join('')}</div><input id="q" type="search" placeholder="Buscar por título o idea…" value="${esc(query)}" oninput="query=this.value;renderList()"></div><div id="list"></div>`;
+}
+function renderList(){
+ const ql=query.trim().toLowerCase();
+ const arr=D.scripts.filter(s=>(filterCh==='all'||s.channel===filterCh)&&(!ql||titleOf(s).toLowerCase().includes(ql)||s.idea.toLowerCase().includes(ql))).sort((a,b)=>b.updated-a.updated);
+ $('#list').innerHTML=arr.length?arr.map(s=>{const C=ch(s.channel),K=col(s.channel);return `<button class="item" onclick="openDetail('${s.id}')"><span class="e" style="background:${K.bg}">${esc(C.emoji)}</span><span class="it"><b>${esc(titleOf(s))}</b><small>${esc(C.name)} · ${fmtDate(s.updated)}</small></span><span class="pill ${s.step>=3?'done':''}">${statusOf(s)}</span></button>`;}).join('')
+ :`<div class="empty">${D.scripts.length?'No hay guiones que coincidan con la búsqueda.':'Todavía no tienes guiones. Empieza el primero con “Nuevo guion”.'}</div>`;
+}
+function openDetail(id){detailId=id;detailTab=null;go('detalle');}
+
+/* ---------- vista: detalle de un guion ---------- */
+function detailTabs(s){return[['idea','💡 Idea',s.idea],['0','1 · Creado',s.texts[0]],['1','2 · Verificado',s.texts[1]],['2','3 · Humanizado',s.texts[2]]];}
+function vDetalle(){
+ const s=D.scripts.find(x=>x.id===detailId);
+ if(!s){view='guiones';setTimeout(render);return'';}
+ const C=ch(s.channel),K=col(s.channel);setAccent(s.channel);
+ const tabs=detailTabs(s),avail=tabs.filter(t=>t[2].trim());
+ if(!detailTab||!avail.find(t=>t[0]===detailTab))detailTab=avail.length?avail[avail.length-1][0]:'idea';
+ const ct=tabs.find(t=>t[0]===detailTab);
+ return `<button class="link" onclick="go('guiones')">← Volver a Mis guiones</button>
+ <div class="card"><div class="det-h"><span class="e big" style="background:${K.bg}">${esc(C.emoji)}</span><div style="flex:1;min-width:0"><input type="text" class="title-in" value="${esc(titleOf(s))}" onchange="renameScript(this.value)" aria-label="Título del guion" title="Haz clic para cambiar el título"><div class="muted">${esc(C.name)} · creado el ${fmtDate(s.created)} · <span class="pill ${s.step>=3?'done':''}">${statusOf(s)}</span></div></div></div>
+ <div class="row" style="margin:18px 0 22px">${s.step<3?`<button class="btn main" onclick="continueScript()">▶ Continuar en el paso ${s.step+1}</button>`:''}<button class="btn soft danger" onclick="delScript()">🗑 Eliminar</button></div>
+ <div class="tabs">${tabs.map(t=>`<button class="tab ${t[0]===detailTab?'on':''}" ${t[2].trim()?'':'disabled'} onclick="detailTab='${t[0]}';render()">${t[1]}</button>`).join('')}</div>
+ <div class="row between"><span class="muted">${fmtWords(ct[2])}</span><button class="btn soft sm" onclick="copyVersion()">📋 Copiar este texto</button></div>
+ <div class="final tall">${ct[2].trim()?esc(ct[2]):'<span class="muted">Vacío</span>'}</div></div>`;
+}
+function renameScript(v){const s=D.scripts.find(x=>x.id===detailId);if(!s)return;s.title=v.trim();s.updated=Date.now();save();toast('Título guardado');}
+function continueScript(){const s=D.scripts.find(x=>x.id===detailId);if(!s)return;D.activeId=s.id;D.lastChannel=s.channel;save();go('nuevo');}
+async function copyVersion(){const s=D.scripts.find(x=>x.id===detailId);const t=detailTabs(s).find(x=>x[0]===detailTab);if(t&&await copyText(t[2]))toast('Texto copiado');}
+function delScript(){
+ const s=D.scripts.find(x=>x.id===detailId);if(!s)return;
+ if(!confirm(`¿Eliminar "${titleOf(s)}"?\n\nSe borran la idea y las 3 versiones. No se puede deshacer.`))return;
+ D.scripts=D.scripts.filter(x=>x.id!==s.id);if(D.activeId===s.id)D.activeId=null;saveNow();toast('Guion eliminado');go('guiones');
+}
+
+/* ---------- vista: mis prompts ---------- */
+function openPrompts(id){promptCh=id;go('prompts');}
+function pickPromptCh(id){promptCh=id;render();}
+function vPrompts(){
+ if(!promptCh)promptCh=(cur()&&cur().channel)||D.lastChannel;
+ const C=ch(promptCh);setAccent(promptCh);
+ const descs=['Recibe la idea del video y escribe el guion. Escribe <code>{{IDEA}}</code> donde quieras que vaya la idea.','Recibe el guion del paso 1 y corrige los datos. Escribe <code>{{GUION}}</code> donde quieras que vaya el guion.','Recibe el guion verificado y lo humaniza. Escribe <code>{{GUION}}</code> donde quieras que vaya el guion.'];
+ return `<div class="page-h"><h1>Mis prompts maestros</h1><span class="muted" id="saved">Se guardan solos</span></div>
+ <div class="q">Elige el canal</div>${channelButtons(promptCh,'pickPromptCh')}
+ <div class="card"><div class="ch-edit"><label>Emoji<input value="${esc(C.emoji)}" maxlength="8" oninput="editCh('emoji',this.value)"></label><label style="flex:1;min-width:180px">Nombre del canal<input value="${esc(C.name)}" oninput="editCh('name',this.value)"></label><label style="flex:2;min-width:220px">De qué trata<input value="${esc(C.sub)}" oninput="editCh('sub',this.value)"></label></div></div>
+ ${[0,1,2].map(i=>`<div class="card"><div class="pc-h"><span class="n">${i+1}</span><div><h3>Prompt ${i+1} · ${STEP_NAMES[i]}</h3><p class="help">${descs[i]}</p></div><span class="pill ${C.prompts[i].trim()?'done':'gray'}" id="pp${i}">${C.prompts[i].trim()?'Cargado ✓':'Vacío'}</span></div><textarea class="ptext" placeholder="Pega aquí tu prompt maestro ${i+1} de ${esc(C.name)}…" oninput="editPrompt(${i},this.value)">${esc(C.prompts[i])}</textarea></div>`).join('')}
+ <p class="muted">Si un prompt no tiene <code>{{IDEA}}</code> o <code>{{GUION}}</code>, la app agrega el texto al final del prompt automáticamente.</p>`;
+}
+let savedT;
+function flashSaved(){const el=$('#saved');if(!el)return;el.textContent='✓ Guardado';el.style.color='#16a34a';clearTimeout(savedT);savedT=setTimeout(()=>{el.textContent='Se guardan solos';el.style.color='';},1500);}
+function editCh(k,v){ch(promptCh)[k]=v;save();flashSaved();}
+function editPrompt(i,v){ch(promptCh).prompts[i]=v;save();flashSaved();const p=$('#pp'+i);p.textContent=v.trim()?'Cargado ✓':'Vacío';p.className='pill '+(v.trim()?'done':'gray');}
+
+/* ---------- vista: copia de seguridad ---------- */
+function vRespaldo(){
+ setAccent(null);
+ const loaded=D.channels.reduce((n,c)=>n+c.prompts.filter(p=>p.trim()).length,0);
+ return `<div class="page-h"><h1>Copia de seguridad</h1></div>
+ <div class="stats"><div class="stat"><b>${D.scripts.length}</b><span>guiones guardados</span></div><div class="stat"><b>${loaded} de 9</b><span>prompts maestros cargados</span></div><div class="stat"><b>${D.lastBackup?fmtDate(D.lastBackup):'Nunca'}</b><span>última copia descargada</span></div></div>
+ <div class="card"><h2>💾 Descargar copia</h2><p class="help">Tus prompts y guiones se guardan solo en este navegador, en esta PC. Descarga una copia cada tanto y guárdala en Google Drive o en un pendrive. Con ella recuperas todo si se borra el navegador o si quieres pasarlo a otra computadora.</p><button class="btn main" onclick="exportData()">⬇ Descargar copia de seguridad</button></div>
+ <div class="card"><h2>📂 Restaurar una copia</h2><p class="help">Carga un archivo de copia (.json) descargado antes. <b>Reemplaza todo</b> lo que hay ahora en la app.</p><label class="btn soft">📂 Elegir archivo<input type="file" accept=".json,application/json" hidden onchange="importData(this)"></label></div>`;
+}
+function exportData(){
+ D.lastBackup=Date.now();saveNow();
+ const blob=new Blob([JSON.stringify(D,null,2)],{type:'application/json'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`guionista-copia-${new Date().toISOString().slice(0,10)}.json`;
+ document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+ toast('Copia descargada');render();
+}
+async function importData(inp){
+ const f=inp.files[0];inp.value='';if(!f)return;
+ let p;try{p=JSON.parse(await f.text());}catch(e){toast('Ese archivo no es una copia válida',true);return;}
+ if(!p||!Array.isArray(p.channels)||!Array.isArray(p.scripts)){toast('Ese archivo no es una copia de Guionista',true);return;}
+ if(!confirm(`Esta copia tiene ${p.scripts.length} guiones.\n\n¿Reemplazar todo lo que hay ahora en la app?`))return;
+ D=normalize(p);saveNow();toast('Copia restaurada');go('nuevo');
+}
+
+/* ---------- inicio ---------- */
+(async()=>{
+ D=normalize(await load());purgeEmpty();render();
+ if(memOnly)toast('Este navegador no permite guardar aquí. Abre la app desde Chrome o Edge.',true);
+ if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+ if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
