@@ -1,5 +1,5 @@
 // Permite abrir la app sin internet. Primero intenta la red (para recibir mejoras) y si no hay, usa la copia guardada.
-const CACHE = 'guionista-v1';
+const CACHE = 'guionista-v2';
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
